@@ -1,0 +1,1 @@
+recursive-include F5_bigip/templates *.html

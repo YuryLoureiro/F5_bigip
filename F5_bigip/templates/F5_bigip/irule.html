@@ -1,0 +1,76 @@
+{% extends 'generic/object.html' %}
+{% load buttons %}
+{% load custom_links %}
+{% load helpers %}
+{% load plugins %}
+{% load render_table from django_tables2 %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'plugins:F5_bigip:irule' %}">Ir para lista de irules</a></li>
+{% endblock %}
+
+{% block controls %}
+<div class="pull-right noprint">
+    {% if perms.F5_bigip.change_irule %}
+    <a href="{% url 'plugins:F5_bigip:irule_add' %}?routing_policy={{ object.pk }}" class="btn btn-success">
+        <span class="mdi mdi-plus-thick" aria-hidden="true"></span> Add iRule
+    </a>
+    {% endif %}
+    {% if perms.F5_bigip.change_irule %}
+    <a href="{% url 'plugins:F5_bigip:irule_edit' pk=object.pk %}" class="btn btn-warning">
+        <span class="mdi mdi-pencil" aria-hidden="true"></span> Edit
+    </a>
+    {% endif %}
+    {% if perms.F5_bigip.delete_irule %}
+    <a href="{% url 'plugins:F5_bigip:irule_delete' pk=object.pk %}" class="btn btn-danger">
+        <span class="mdi mdi-trash-can-outline" aria-hidden="true"></span> Delete
+    </a>
+    {% endif %}
+</div>
+{% endblock controls %}
+
+{% block subtitle %}
+{% endblock %}
+
+{% block extra_tabs %}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="details">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <strong>Informações da Regra</strong>
+                            </div>
+                            <table class="table table-hover panel-body attr-table">
+                                <tr>
+                                    <td>Nome</td>
+                                    <td>{{ object.name }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Partição</td>
+                                    <td>{{ object.partition_id }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <strong>Definição da iRule</strong>
+                            </div>
+                            <tr>
+                                <pre><code>{{ object.definition }}</code></pre>
+                            </tr>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

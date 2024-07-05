@@ -1,0 +1,14 @@
+{% extends 'generic/object.html' %}
+{% load buttons %}
+{% load custom_links %}
+{% load helpers %}
+{% load plugins %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'plugins:F5_bigip:partition' %}">Ir para lista de partições</a></li>
+{% endblock %}
+
+{% block subtitle %}
+{% endblock %}
+
+{% block extra_tabs %}{% endblock %}

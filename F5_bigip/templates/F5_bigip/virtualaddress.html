@@ -1,0 +1,15 @@
+{% extends 'generic/object.html' %}
+{% load buttons %}
+{% load custom_links %}
+{% load helpers %}
+{% load plugins %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'plugins:F5_bigip:virtualaddress' %}">Ir para lista de endereços
+        virtuais</a></li>
+{% endblock %}
+
+{% block subtitle %}
+{% endblock %}
+
+{% block extra_tabs %}{% endblock %}

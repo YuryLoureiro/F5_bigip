@@ -1,0 +1,50 @@
+{% extends 'generic/object.html' %}
+{% load buttons %}
+{% load custom_links %}
+{% load helpers %}
+{% load plugins %}
+{% load render_table from django_tables2 %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'plugins:F5_bigip:pool' %}">Ir para lista de Pools</a></li>
+{% endblock %}
+
+{% block subtitle %}
+{% endblock %}
+
+{% block extra_tabs %}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="details">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <strong>Informações Node</strong>
+                            </div>
+                            <table class="table table-hover panel-body attr-table">
+                                <tr>
+                                    <td>Nome</td>
+                                    <td>{{ object.name }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <strong>Membros da Pool</strong>
+                            </div>
+                            {% render_table pool_table %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
