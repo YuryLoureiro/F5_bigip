@@ -270,6 +270,7 @@ class PoolForm(NetBoxModelForm):
             "name",
             "allownat",
             "allowsnat",
+            "load_balancing_mode",
             "description",
             "partition_id",
         ]

@@ -22,24 +22,24 @@ from .filtersets import *
 from .forms import *
 
 #Node
+class NodeView(generic.ObjectView):
+    queryset = Node.objects.all()
+    #table = NodeTable
+    #def get_extra_context(self, request, instance):
+    #    pool_table = PoolMemberTable(instance.pools.all())
+    #
+    #    data = {
+    #            "pool_table" : pool_table,
+    #        }
+    #    return data
+
 class NodeListView(generic.ObjectListView):
     queryset = Node.objects.all()
     table = NodeTable
     filterset = NodeFilterSet
     filterset_form = NodeFilterForm
     action_buttons = ('add',)
-
-class NodeView(generic.ObjectView):
-    queryset = Node.objects.all()
-    table = NodeTable
-    def get_extra_context(self, request, instance):
-        pool_table = PoolMemberTable(instance.pools.all())
-
-        data = {
-                "pool_table" : pool_table,
-            }
-        return data
-
+    
 class NodeEdit(generic.ObjectEditView):
     queryset = Node.objects.all()
     form = NodeForm

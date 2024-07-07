@@ -3,6 +3,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.urls import reverse
 from django.db.models.functions import Lower
+from utilities.querysets import RestrictedQuerySet
+
 
 from netbox.models import NetBoxModel
 
@@ -38,6 +40,9 @@ class Node(models.Model):
         null = False,
         blank = False
     )
+
+    objects = RestrictedQuerySet.as_manager()
+
     class Meta:
         ordering = ["name"]
         verbose_name = 'Node'
@@ -82,6 +87,7 @@ class Pool(models.Model):
         blank=True
     )
     partition_id = models.ForeignKey(to='Partition', on_delete = models.CASCADE, null=False, blank = False)
+    objects = RestrictedQuerySet.as_manager()
     class Meta:
         ordering = ["name"]
         verbose_name = 'Pool'
@@ -112,6 +118,7 @@ class PoolMember(models.Model):
         choices=StateChoices,
         default=StateChoices.STATE_ENABLED
     )
+    objects = RestrictedQuerySet.as_manager()
     class Meta:
         ordering = ["name"]
         verbose_name = 'Member'
@@ -129,7 +136,7 @@ class Irule(models.Model):
     )
     partition_id = models.ForeignKey(to='Partition', on_delete = models.CASCADE, null=False, blank = False)
     definition = models.TextField(blank=False,)
-
+    objects = RestrictedQuerySet.as_manager()
     class Meta:
         ordering = ["name"]
         verbose_name = 'Irule'
@@ -172,6 +179,7 @@ class VirtualServer(models.Model):
         related_name="virtual_servers",
         blank=True,
     )
+    objects = RestrictedQuerySet.as_manager()
     class Meta:
         ordering = ["name"]
         verbose_name = 'Virtual Server'
@@ -191,6 +199,7 @@ class VirtualAddress(models.Model):
     )
     ipaddress_id = models.ForeignKey(to = 'ipam.IPAddress', on_delete=models.CASCADE, null=True, blank=True)
     partition_id = models.ForeignKey(to='Partition', on_delete = models.CASCADE, null=False, blank = False)
+    objects = RestrictedQuerySet.as_manager()
     class Meta:
         ordering = ["ipaddress_id"]
         verbose_name = 'Virtual Address'
@@ -208,6 +217,7 @@ class Clusterf5(models.Model):
         "Name",
         max_length=200
     )
+    objects = RestrictedQuerySet.as_manager()
     class Meta:
         ordering = ["name"]
         verbose_name = 'Cluster'
@@ -226,7 +236,7 @@ class Partition(models.Model):
         max_length=200
     )
     devicef5_id = models.ForeignKey(to = 'Devicef5', on_delete=models.CASCADE, null=False, blank=False)
-
+    objects = RestrictedQuerySet.as_manager()
     class Meta:
         ordering = ["name"]
         verbose_name = 'Partition'
@@ -245,7 +255,7 @@ class Devicef5(models.Model):
     )
     device_id = models.ForeignKey(to = 'dcim.Device', on_delete=models.CASCADE, null=False, blank=False)
     clusterf5_id = models.ForeignKey(to = 'Clusterf5', on_delete=models.CASCADE, null=False, blank=True)
-
+    objects = RestrictedQuerySet.as_manager()
     class Meta:
         ordering = ["name"]
         verbose_name = 'Device'

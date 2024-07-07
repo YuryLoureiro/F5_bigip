@@ -1,4 +1,4 @@
-from netbox.plugins import PluginTemplateExtension
+'''from netbox.plugins import PluginTemplateExtension
 from netbox.plugins.utils import get_plugin_config
 from django.conf import settings
 from packaging import version
@@ -23,3 +23,4 @@ supported_assets = supported_assets + additional_assets
 template_extensions = []
 for supported_asset in supported_assets:
     template_extensions.append(create_button(supported_asset))
+'''
