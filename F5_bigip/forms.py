@@ -410,6 +410,12 @@ class VirtualServerForm(NetBoxModelForm):
         required=True,
         label="Partition",
     )
+    irules = forms.ModelMultipleChoiceField(
+        queryset=Irule.objects.all(),
+        label='iRules',
+        required=False,
+    )
+
     class Meta:
         model = VirtualServer
         fields = [
@@ -419,8 +425,16 @@ class VirtualServerForm(NetBoxModelForm):
             "source_address",
             "port",
             "state",
-            "partition_id"
+            "partition_id",
+            "irules"
         ]
+
+    def save(self, commit=True):
+        virtual_server = super().save(commit=False)
+        if commit:
+            virtual_server.save()
+        self.save_m2m()
+        return virtual_server
 
 
 class VirtualAddressForm(NetBoxModelForm):
