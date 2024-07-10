@@ -1,6 +1,7 @@
 
 from .models import Clusterf5, Devicef5, Irule, Node, Partition, Pool, PoolMember, VirtualAddress, VirtualServer
 from .choices import *
+from django.forms import formset_factory
 
 from django import forms
 from django.contrib.contenttypes.models import ContentType
@@ -29,10 +30,6 @@ class NodeFilterForm(NetBoxModelFilterSetForm):
     q = forms.CharField(
         required=False,
         label='Search'
-    )
-    state = forms.MultipleChoiceField(
-        choices=StateChoices,
-        required=False,
     )
 
 class NodeBulkEditForm(NetBoxModelBulkEditForm):
@@ -241,29 +238,70 @@ class NodeForm(NetBoxModelForm):
         required=True,
         label='Nome do Node'
     )
-
-    ipaddress_id = forms.ModelChoiceField(queryset = IPAddress.objects.all() ,label='Endereço IP')
+    ipaddress_id = forms.ModelChoiceField(queryset = IPAddress.objects.all() ,label='IP Address')
     partition_id = forms.ModelChoiceField(queryset = Partition.objects.all() ,label='Partition')
-    state = forms.ChoiceField(
-        required=True,
-        choices=StateChoices
-    )
     class Meta:
         model = Node
         fields = [
             "name",
             "ipaddress_id",
             "description",
-            "state",
             "partition_id"
         ]
 
-class PoolForm(NetBoxModelForm):
+'''class PoolForm(NetBoxModelForm):
     name = forms.CharField(
         required=True,
         label='Nome da pool'
     )
     partition_id = forms.ModelChoiceField(queryset = Partition.objects.all() ,label='Partition')
+    new_members = forms.ModelChoiceField(
+        queryset = Node.objects.all(), 
+        label='New Members',
+        required=True,
+    )
+    class Meta:
+        model = Pool
+        fields = [
+            "name",
+            "allownat",
+            "allowsnat",
+            "load_balancing_mode",
+            "description",
+            "partition_id",
+        ]
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if commit:
+            instance.save()
+            pool_members_names = self.cleaned_data['new_members'].split(',')
+            for name in pool_members_names:
+                if name.strip():  # Avoid creating empty devices
+                    PoolMember.objects.create(name=name.strip(), clusterf5_id=instance)
+        return instance'''
+'''class PoolForm(forms.ModelForm):
+    name = forms.CharField(
+        required=True,
+        label='Nome da pool',
+        widget=forms.TextInput(attrs={'id': 'id_name'})
+    )
+    partition_id = forms.ModelChoiceField(
+        queryset=Partition.objects.all(),
+        label='Partition',
+        widget=forms.Select(attrs={'id': 'id_partition_id'})
+    )
+    new_members = forms.ModelMultipleChoiceField(
+        queryset=Node.objects.none(),
+        label='New Members',
+        required=True,
+        widget=forms.CheckboxSelectMultiple(attrs={'id': 'id_new_members'})
+    )
+    ports = forms.CharField(
+        required=True,
+        label='Ports (comma-separated, matching order of nodes selected)',
+        widget=forms.TextInput(attrs={'id': 'id_ports'})
+    )
+
     class Meta:
         model = Pool
         fields = [
@@ -275,19 +313,118 @@ class PoolForm(NetBoxModelForm):
             "partition_id",
         ]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'partition_id' in self.data:
+            try:
+                partition_id = int(self.data.get('partition_id'))
+                self.fields['new_members'].queryset = Node.objects.filter(partition_id=partition_id)
+            except (ValueError, TypeError):
+                pass
+        elif self.instance.pk:
+            self.fields['new_members'].queryset = self.instance.partition_id.node_set
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if commit:
+            instance.save()
+            selected_nodes = self.cleaned_data['new_members']
+            ports = self.cleaned_data['ports'].split(',')
+            for node, port in zip(selected_nodes, ports):
+                PoolMember.objects.create(
+                    name=node.name,
+                    node_id=node,
+                    port=port.strip(),
+                    pool_id=instance,
+                    state=PoolMember.STATE_ENABLED
+                )
+        return instance'''
+
+class PoolForm(NetBoxModelForm):
+    name = forms.CharField(
+        required=True,
+        label='Nome da pool'
+    )
+    partition_id = forms.ModelChoiceField(queryset=Partition.objects.all(), label='Partition')
+    new_members = forms.ModelMultipleChoiceField(
+        queryset=Node.objects.all(),
+        label='New Members',
+        required=True,
+    )
+    ports = forms.CharField(
+        required=True,
+        label='Ports (comma-separated, one for each member)'
+    )
+
+    class Meta:
+        model = Pool
+        fields = [
+            "name",
+            "allownat",
+            "allowsnat",
+            "load_balancing_mode",
+            "description",
+            "partition_id",
+        ]
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if commit:
+            instance.save()
+            selected_nodes = self.cleaned_data['new_members']
+            ports = self.cleaned_data['ports'].split(',')
+            for node, port in zip(selected_nodes, ports):
+                PoolMember.objects.create(
+                    name=node.name,
+                    node_id=node,
+                    port=port.strip(),
+                    pool_id=instance,
+                    state=StateChoices.STATE_ENABLED  # Default state
+                )
+        return instance
+
 class VirtualServerForm(NetBoxModelForm):
-    name = forms.CharField(label='Nome Virtual Server')
+    name = forms.CharField(label='Name')
+    description = forms.CharField(
+        required=False,
+        label="Description",
+    )
+    port = forms.CharField(
+        label="Port",
+    )
+    state = forms.ChoiceField(
+        choices=StateChoices,
+        required=True,
+    )
+    VS_type = forms.ChoiceField(
+        choices=VirtServerChoices,
+        label="Type",
+        required=True,
+    )
+    source_address = forms.CharField(
+        required=True,
+        label="Source Address",
+    )
+    partition_id = forms.ModelChoiceField(
+        queryset=Partition.objects.all(),
+        required=True,
+        label="Partition",
+    )
     class Meta:
         model = VirtualServer
         fields = [
             "name",
+            "description",
+            "VS_type",
+            "source_address",
             "port",
+            "state",
             "partition_id"
         ]
 
 
 class VirtualAddressForm(NetBoxModelForm):
-    ipaddress_id = forms.ModelChoiceField(queryset = IPAddress.objects.all() ,label='Endereço IP')
+    ipaddress_id = forms.ModelChoiceField(queryset = IPAddress.objects.all() ,label='IP Address')
     class Meta:
         model = VirtualAddress
         fields = [
@@ -295,7 +432,7 @@ class VirtualAddressForm(NetBoxModelForm):
         ]
 
 class PoolMemberForm(NetBoxModelForm):
-    name = forms.CharField(label = 'Nome do Membro da Pool')
+    name = forms.CharField(label = 'Name')
     node_id = forms.ModelChoiceField(queryset = Node.objects.all() ,label='Node', required=True)
     class Meta:
         model = PoolMember
@@ -306,8 +443,8 @@ class PoolMemberForm(NetBoxModelForm):
             "pool_id",
         ]
 
-class Clusterf5Form(NetBoxModelForm):
-    name = forms.CharField(label = 'Nome do cluster')
+class Clusterf5Form(forms.ModelForm):
+    name = forms.CharField(label='Name')
     class Meta:
         model = Clusterf5
         fields = [
@@ -315,7 +452,7 @@ class Clusterf5Form(NetBoxModelForm):
         ]
 
 class PartitionForm(NetBoxModelForm):
-    name = forms.CharField(label = 'Nome')
+    name = forms.CharField(label = 'Name')
     clusterf5_id = forms.ModelChoiceField(queryset = Clusterf5.objects.all() ,label='Cluster', required=True)
     class Meta:
         model = Partition
@@ -324,7 +461,12 @@ class PartitionForm(NetBoxModelForm):
         ]
 
 class IruleForm(NetBoxModelForm):
-    name = forms.CharField(label = 'Nome da Irule')
+    name = forms.CharField(label = 'Name')
+    partition_id = forms.ModelChoiceField(
+        queryset=Partition.objects.all(),
+        required=True,
+        label="Partition",
+    )
     class Meta:
         model = Irule
         fields = [
@@ -334,15 +476,37 @@ class IruleForm(NetBoxModelForm):
         ]
 
 class Devicef5Form(NetBoxModelForm):
-    name = forms.CharField(label = 'Nome do device')
+    name = forms.CharField(label='Name')
+    device_id = forms.ModelChoiceField(queryset=Device.objects.all(), label='Device', required=True)
+    clusterf5_id = forms.ModelChoiceField(queryset=Clusterf5.objects.all(), label='Cluster', required=False)
+    partitions = forms.CharField(
+        label='Partitions', 
+        required=False, 
+        widget=forms.Textarea(attrs={'rows': 3}),
+        help_text='Enter partition names separated by commas'
+    )
+
     class Meta:
         model = Devicef5
         fields = [
             "name",
             "device_id",
             "clusterf5_id",
+            "partitions",  # Add partitions field
         ]
 
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if commit:
+            instance.save()
+            # Clear existing partitions
+            Partition.objects.filter(devicef5_id=instance).delete()
+            # Add new partitions
+            partition_names = self.cleaned_data['partitions'].split(',')
+            for name in partition_names:
+                if name.strip():  # Avoid creating empty partitions
+                    Partition.objects.create(name=name.strip(), devicef5_id=instance)
+        return instance
 
 """ class SettingsForm(NetBoxModelForm):
     class Meta:

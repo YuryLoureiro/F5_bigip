@@ -26,12 +26,6 @@ class Node(models.Model):
         max_length=200,
         blank=True
     )
-    state = models.CharField(
-        "State",
-        max_length=200,
-        choices=StateChoices,
-        default=StateChoices.STATE_ENABLED
-    )
     partition_id = models.ForeignKey(
         to='Partition',
         on_delete = models.CASCADE,
@@ -161,8 +155,17 @@ class VirtualServer(models.Model):
         blank=True
     )
     #mask = models.IntegerField(default=0)
+    source_address = models.CharField(
+        "Source Address",
+    )
+    state = models.CharField(
+        "State",
+        max_length=200,
+        choices=StateChoices,
+        default=StateChoices.STATE_ENABLED
+    )
     port = models.CharField(
-        "Porta",
+        "Port",
         max_length=65535,
     )
     VS_type = models.CharField(
@@ -254,7 +257,7 @@ class Devicef5(models.Model):
         max_length=200
     )
     device_id = models.ForeignKey(to = 'dcim.Device', on_delete=models.CASCADE, null=False, blank=False)
-    clusterf5_id = models.ForeignKey(to = 'Clusterf5', on_delete=models.CASCADE, null=False, blank=True)
+    clusterf5_id = models.ForeignKey(to = 'Clusterf5', on_delete=models.SET_NULL, null=True, blank=True)
     objects = RestrictedQuerySet.as_manager()
     class Meta:
         ordering = ["name"]

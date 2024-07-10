@@ -15,6 +15,8 @@ urlpatterns = [
     path("node/<int:pk>/", include(get_model_urls(app_name, 'node'))),
     path("node/<int:pk>/edit/", views.NodeEdit.as_view(), name="node_edit"),
     path("node/<int:pk>/delete/", views.NodeDelete.as_view(), name="node_delete"),
+    path("node/<int:pk>/changelog/", ObjectChangeLogView.as_view(), name="node_changelog", kwargs={"model": models.Node}),
+
 
     path("pool/", views.PoolListView.as_view(), name="pool"),
     path("pool/add/", views.PoolEdit.as_view(), name="pool_add"),

@@ -1,0 +1,77 @@
+{% extends 'generic/object.html' %}
+
+{% load custom_filters %} {# Carrega os filtros personalizados #}
+
+{% block breadcrumbs %}
+{# Verifica se object é um objeto válido antes de acessar seus atributos #}
+{% if object and object._meta %}
+<li class="breadcrumb-item">
+    <a href="{% url object|viewname %}"> {# Usa o filtro viewname aqui #}
+        {% if object._meta.verbose_name_plural %}
+        {{ object|meta:'verbose_name_plural'|bettertitle }}
+        {% else %}
+        Object não possui meta
+        {% endif %}
+    </a>
+</li>
+{% endif %}
+{% endblock breadcrumbs %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1>{% if form.instance.pk %}Edit Pool{% else %}Add Pool{% endif %}</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="form-group">
+            <label for="id_name">{{ form.name.label }}</label>
+            {{ form.name }}
+        </div>
+        <div class="form-group">
+            <label for="id_partition_id">{{ form.partition_id.label }}</label>
+            {{ form.partition_id }}
+        </div>
+        <div class="form-group">
+            <label for="id_new_members">{{ form.new_members.label }}</label>
+            {{ form.new_members }}
+        </div>
+        <div class="form-group">
+            <label for="id_ports">{{ form.ports.label }}</label>
+            {{ form.ports }}
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+    </form>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#id_partition_id').change(function () {
+                var partitionId = $(this).val();
+                if (partitionId) {
+                    $.ajax({
+                        url: '{% url "get-nodes" %}',
+                        data: {
+                            'partition_id': partitionId
+                        },
+                        success: function (data) {
+                            var nodes = data.nodes;
+                            var newMembersSelect = $('#id_new_members');
+                            newMembersSelect.empty();
+                            $.each(nodes, function (index, node) {
+                                newMembersSelect.append(
+                                    $('<option></option>').val(node.id).text(node.name)
+                                );
+                            });
+                        }
+                    });
+                } else {
+                    $('#id_new_members').empty();
+                }
+            });
+        });
+    </script>
+</div>
+{% endblock %}

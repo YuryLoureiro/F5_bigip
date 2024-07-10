@@ -1,5 +1,10 @@
 from django.core.exceptions import MultipleObjectsReturned, ValidationError, ObjectDoesNotExist
 from django.contrib.contenttypes.models import ContentType
+from django.http import HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404
+from django.http import JsonResponse
+from django.shortcuts import redirect
+
 
 from netbox.views import generic
 from dcim.models import Device, Site
@@ -81,8 +86,7 @@ class PoolView(generic.ObjectView):
 class PoolEdit(generic.ObjectEditView):
     queryset = Pool.objects.all()
     form = PoolForm
-
-
+    
 class PoolDelete(generic.ObjectDeleteView):
     queryset = Pool.objects.all()
 
@@ -257,10 +261,12 @@ class PartitionBulkEditView(generic.BulkEditView):
 
 #Devicef5
 class Devicef5ListView(generic.ObjectListView):
+    #queryset = Devicef5.objects.restrict(request.user, 'view')
     queryset = Devicef5.objects.all()
     table = Devicef5Table
     filterset = Devicef5FilterSet
     filterset_form = Devicef5FilterForm
+    action_buttons = ('add',)
 
 class Devicef5View(generic.ObjectView):
     queryset = Devicef5.objects.all()

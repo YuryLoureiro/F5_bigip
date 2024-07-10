@@ -13,7 +13,7 @@ class NodeFilterSet(django_filters.FilterSet):
 
     class Meta:
         model = Node
-        fields = ['name', 'ipaddress_id', 'description', 'state', 'partition_id']
+        fields = ['name', 'ipaddress_id', 'description', 'partition_id']
 
     def search(self, queryset, name, value):
         """Perform the filtered search."""
@@ -24,7 +24,7 @@ class NodeFilterSet(django_filters.FilterSet):
         )
         return queryset.filter(qs_filter)
 
-    def state(self, queryset, name, value):
+'''    def state(self, queryset, name, value):
         """Perform the filtered search."""
         if not value.strip():
             return queryset
@@ -32,7 +32,7 @@ class NodeFilterSet(django_filters.FilterSet):
                 Q(state__icontains=value)
         )
         return queryset.filter(qs_filter)
-
+'''
 class PoolFilterSet(django_filters.FilterSet):
     q = django_filters.CharFilter(
         method='search',

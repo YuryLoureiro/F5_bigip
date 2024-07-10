@@ -5,10 +5,64 @@
 {% load plugins %}
 
 {% block breadcrumbs %}
-<li class="breadcrumb-item"><a href="{% url 'plugins:F5_bigip:devicef5' %}">Ir para lista de devices</a></li>
+<li class="breadcrumb-item"><a href="{% url 'plugins:F5_bigip:devicef5' %}">Devices</a></li>
+<li class="breadcrumb-item active">{{ object.name }}</li>
 {% endblock %}
 
-{% block subtitle %}
-{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Device Information</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm table-borderless">
+                    <tr>
+                        <th>Name:</th>
+                        <td>{{ object.name }}</td>
+                    </tr>
+                    <tr>
+                        <th>Device ID:</th>
+                        <td>{{ object.device_id }}</td>
+                    </tr>
+                    <tr>
+                        <th>Cluster:</th>
+                        <td>{{ object.clusterf5_id }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
-{% block extra_tabs %}{% endblock %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Partitions</h5>
+            </div>
+            <div class="card-body">
+                {% if object.partition_set.all %}
+                <table class="table table-hover table-sm">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for partition in object.partition_set.all %}
+                        <tr>
+                            <td>{{ partition.name }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>No partitions available for this device.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

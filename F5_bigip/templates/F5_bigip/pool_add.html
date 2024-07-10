@@ -1,0 +1,63 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Pool</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* Estilos opcionais */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-4">
+        <h2>Create Pool</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+            <div id="port-fields">
+                <!-- Campos node + port dinâmicos serão adicionados aqui -->
+            </div>
+
+            <button type="button" class="btn btn-primary mt-3" id="add-port">Add Port</button>
+            <button type="submit" class="btn btn-success mt-3">Criar Pool</button>
+        </form>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            var portFieldIndex = 0;
+
+            $('#add-port').click(function () {
+                portFieldIndex++;
+                var newField = `
+                    <div class="form-group">
+                        <label for="id_new_members_${portFieldIndex}">Node:</label>
+                        <select name="new_members" id="id_new_members_${portFieldIndex}" class="form-control">
+                            <!-- Renderize opções para seleção de nodes -->
+                            {% for node in form.new_members.field.queryset %}
+                                <option value="{{ node.id }}">{{ node.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="id_port_${portFieldIndex}">Port:</label>
+                        <input type="text" name="port_${portFieldIndex}" id="id_port_${portFieldIndex}" class="form-control" required>
+                    </div>
+                `;
+                $('#port-fields').append(newField);
+            });
+        });
+    </script>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

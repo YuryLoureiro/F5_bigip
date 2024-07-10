@@ -48,12 +48,10 @@ class PoolBalancingChoices(ChoiceSet):
 class StateChoices(ChoiceSet):
     STATE_ENABLED = "Enabled"
     STATE_DISABLED = "Disabled"
-    STATE_FORCED_OFF = "Forced Offline"
 
     CHOICES = (
-        (STATE_ENABLED, 'Enabled (All traffic allowed)'),
-        (STATE_DISABLED, 'Disabled (Only persistent or active connections allowed)'),
-        (STATE_DISABLED, 'Forced Offline (Only active connections allowed)'),
+        (STATE_ENABLED, 'Enabled'),
+        (STATE_DISABLED, 'Disabled'),
     )
 
 class PoolAllowChoices(ChoiceSet):
