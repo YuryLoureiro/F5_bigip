@@ -178,7 +178,7 @@ class PoolMemberView(generic.ObjectView):
 
 class PoolMemberEdit(generic.ObjectEditView):
     queryset = PoolMember.objects.all()
-    form = PoolMemberForm
+    form = PoolMemberEditForm
 
 
 class PoolMemberDelete(generic.ObjectDeleteView):

@@ -46,10 +46,9 @@ urlpatterns = [
     path("virtualaddress/<int:pk>/changelog/", ObjectChangeLogView.as_view(), name="virtualaddress_changelog", kwargs={"model": models.VirtualAddress}),
 
     path("poolmember/", views.PoolMemberListView.as_view(), name="poolmember"),
-    path("poolmember/add/", views.PoolMemberEdit.as_view(), name="poolmember_add"),
     path("poolmember/edit/", views.PoolMemberBulkEditView.as_view(), name="poolmember_bulk_edit"),
     path("poolmember/delete/", views.PoolMemberBulkDelete.as_view(), name="poolmember_bulk_delete"),
-    path("poolmember/<int:pk>/", views.PoolMemberView.as_view(), name="poolmember"),
+    path("poolmember/<int:pk>/", views.PoolMemberEdit.as_view(), name="poolmember"),
     path("poolmember/<int:pk>/edit/", views.PoolMemberEdit.as_view(), name="poolmember_edit"),
     path("poolmember/<int:pk>/delete/", views.PoolMemberDelete.as_view(), name="poolmember_delete"),
     path("poolmember/<int:pk>/changelog/", ObjectChangeLogView.as_view(), name="poolmember_changelog", kwargs={"model": models.PoolMember}),

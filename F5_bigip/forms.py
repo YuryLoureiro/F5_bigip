@@ -84,7 +84,7 @@ class PoolMemberFilterForm(NetBoxModelFilterSetForm):
         label='Search'
     )
 
-class PoolMemberBulkEditForm(NetBoxModelBulkEditForm):
+'''class PoolMemberBulkEditForm(NetBoxModelBulkEditForm):
     pk = forms.ModelMultipleChoiceField(
         queryset=PoolMember.objects.all(),
         widget=forms.MultipleHiddenInput
@@ -97,7 +97,72 @@ class PoolMemberBulkEditForm(NetBoxModelBulkEditForm):
     model = PoolMember
     nullable_fields = [
        'description',
-    ]
+    ]'''
+class PoolMemberEditForm(NetBoxModelForm):
+    class Meta:
+        model = PoolMember
+        fields = ['name', 'node_id', 'port', 'state', 'description']
+
+    name = forms.CharField(
+        max_length=200,
+        required=False,
+        widget=forms.TextInput(attrs={'readonly': 'readonly'})
+    )
+    node_id = forms.ModelChoiceField(
+        queryset=PoolMember.objects.all(),
+        required=False,
+        label='Node name',
+        widget=forms.Select(attrs={'readonly': 'readonly', 'disabled': 'disabled'})
+    )
+    port = forms.CharField(
+        max_length=65535,
+        required=False,
+        label='Service Port',
+        widget=forms.TextInput(attrs={'readonly': 'readonly'})
+    )
+    state = forms.ChoiceField(
+        choices=AStateChoices,
+        required=False
+    )
+    description = forms.CharField(
+        max_length=200,
+        required=False
+    )
+
+
+class PoolMemberBulkEditForm(NetBoxModelBulkEditForm):
+    pk = forms.ModelMultipleChoiceField(
+        queryset=PoolMember.objects.all(),
+        widget=forms.MultipleHiddenInput
+    )
+    description = forms.CharField(
+        max_length=200,
+        required=False
+    )
+    state = forms.ChoiceField(
+        choices=AStateChoices,
+        required=False
+    )
+
+    name = forms.CharField(
+        max_length=200,
+        required=False,
+        widget=forms.TextInput(attrs={'readonly': 'readonly'})
+    )
+    node_id = forms.ModelChoiceField(
+        queryset=PoolMember.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'readonly': 'readonly', 'disabled': 'disabled'})
+    )
+    port = forms.CharField(
+        max_length=65535,
+        required=False,
+        widget=forms.TextInput(attrs={'readonly': 'readonly'})
+    )
+    class Meta:
+        model = PoolMember
+        fields = ['description', 'state', 'name', 'node_id', 'port']
+        nullable_fields = ['description']
 
 class VirtualServerFilterForm(NetBoxModelFilterSetForm):
     model = VirtualServer
@@ -443,18 +508,6 @@ class VirtualAddressForm(NetBoxModelForm):
         model = VirtualAddress
         fields = [
             "ipaddress_id",
-        ]
-
-class PoolMemberForm(NetBoxModelForm):
-    name = forms.CharField(label = 'Name')
-    node_id = forms.ModelChoiceField(queryset = Node.objects.all() ,label='Node', required=True)
-    class Meta:
-        model = PoolMember
-        fields = [
-            "name",
-            "node_id",
-            "port",
-            "pool_id",
         ]
 
 class Clusterf5Form(forms.ModelForm):

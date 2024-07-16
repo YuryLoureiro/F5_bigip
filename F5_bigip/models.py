@@ -26,6 +26,12 @@ class Node(models.Model):
         max_length=200,
         blank=True
     )
+    state = models.CharField(
+        "State",
+        max_length=200,
+        choices=AStateChoices,
+        default=AStateChoices.STATE_ENABLED
+    )
     partition_id = models.ForeignKey(
         to='Partition',
         on_delete = models.CASCADE,
@@ -109,8 +115,8 @@ class PoolMember(models.Model):
     state = models.CharField(
         "State",
         max_length=200,
-        choices=StateChoices,
-        default=StateChoices.STATE_ENABLED
+        choices=AStateChoices,
+        default=AStateChoices.STATE_ENABLED
     )
     objects = RestrictedQuerySet.as_manager()
     class Meta:

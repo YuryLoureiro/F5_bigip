@@ -54,6 +54,17 @@ class StateChoices(ChoiceSet):
         (STATE_DISABLED, 'Disabled'),
     )
 
+class AStateChoices(ChoiceSet):
+    STATE_ENABLED = "Enabled"
+    STATE_DISABLED = "Disabled"
+    STATE_FO = "Forced Offline"
+
+    CHOICES = (
+        (STATE_ENABLED, 'Enabled'),
+        (STATE_DISABLED, 'Disabled'),
+        (STATE_FO, 'Forced Offline'),
+    )
+
 class PoolAllowChoices(ChoiceSet):
     CHOICE_YES = 'yes'
     CHOICE_NO = 'no'
