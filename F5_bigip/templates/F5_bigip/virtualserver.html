@@ -1,3 +1,4 @@
+{# virtualserver.html #}
 {% extends 'generic/object.html' %}
 {% load buttons %}
 {% load custom_links %}
@@ -6,11 +7,59 @@
 
 {% block breadcrumbs %}
 <li class="breadcrumb-item"><a href="{% url 'plugins:F5_bigip:virtualserver' %}">Ir para lista de servidores
-        virtuais</a>
-</li>
+                virtuais</a></li>
+<li class="breadcrumb-item active">{{ object.name }}</li>
 {% endblock %}
 
 {% block subtitle %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+        <div class="col-md-6">
+                <div class="panel panel-default">
+                        <div class="panel-heading">
+                                <strong>Informações do Virtual Server</strong>
+                        </div>
+                        <table class="table table-hover panel-body attr-table">
+                                <tr>
+                                        <td>Nome</td>
+                                        <td>{{ object.name }}</td>
+                                </tr>
+                                <tr>
+                                        <td>Partição</td>
+                                        <td>{{ object.partition_id }}</td>
+                                </tr>
+                                <tr>
+                                        <td>Tipo</td>
+                                        <td>{{ object.VS_type }}</td>
+                                </tr>
+                        </table>
+                </div>
+        </div>
+
+        <div class="col-md-6">
+                <div class="panel panel-default">
+                        <div class="panel-heading">
+                                <strong>Detalhes do Serviço</strong>
+                        </div>
+                        <table class="table table-hover panel-body attr-table">
+                                <tr>
+                                        <td>Endereço IP</td>
+                                        <td>{{ object.source_address }}</td>
+                                </tr>
+                                <tr>
+                                        <td>Porta do Serviço</td>
+                                        <td>{{ object.port }}</td>
+                                </tr>
+                                <tr>
+                                        <td>Estado</td>
+                                        <td>{{ object.get_state_display }}</td>
+                                </tr>
+                        </table>
+                </div>
+        </div>
+</div>
 {% endblock %}
 
 {% block extra_tabs %}{% endblock %}
